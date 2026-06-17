@@ -1,6 +1,6 @@
 # TXT 阅读器
 
-一个安静、清晰、面向中文小说阅读的 macOS 桌面 TXT 阅读器。基于 Electron + React + Vite 构建。
+一个安静、清晰、面向中文阅读的 macOS 桌面 TXT 阅读器，支持各种文本格式。基于 Electron + React + Vite 构建。
 
 ## 下载
 

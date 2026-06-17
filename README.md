@@ -2,6 +2,16 @@
 
 一个安静、清晰、面向中文小说阅读的 macOS 桌面 TXT 阅读器。基于 Electron + React + Vite 构建。
 
+## 下载
+
+从 [GitHub Releases](https://github.com/MartyYao/txt-reader/releases/latest) 下载最新版本。
+
+当前发布包：
+- `TXT Reader-1.0.0-arm64.dmg`：macOS Apple Silicon 安装包
+- `TXT Reader-1.0.0-arm64-mac.zip`：macOS Apple Silicon 压缩包
+
+说明：当前构建未使用 Apple Developer ID 签名。首次打开时，macOS 可能提示“无法验证开发者”；可在“系统设置 → 隐私与安全性”中允许打开。
+
 ## 已实现功能
 
 ### 文件操作

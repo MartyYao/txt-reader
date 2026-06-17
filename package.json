@@ -1,0 +1,59 @@
+{
+  "name": "txt-reader",
+  "version": "1.0.0",
+  "description": "A clean, modern TXT reader for macOS with Chinese novel support",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "ELECTRON_RUN_AS_NODE= concurrently -k \"vite\" \"wait-on http://localhost:5173 && ELECTRON_RUN_AS_NODE= electron .\"",
+    "build": "vite build && ELECTRON_RUN_AS_NODE= electron-builder",
+    "build:renderer": "vite build",
+    "start": "ELECTRON_RUN_AS_NODE= electron .",
+    "pack": "ELECTRON_RUN_AS_NODE= electron-builder --dir",
+    "lint": "vite build --mode production"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3",
+    "jschardet": "^3.1.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.2",
+    "concurrently": "^10.0.3",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3",
+    "vite": "^8.0.16",
+    "wait-on": "^9.0.10"
+  },
+  "build": {
+    "appId": "local.txt-reader",
+    "productName": "TXT Reader",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["txt", "text", "log", "md"],
+        "name": "Plain Text Document",
+        "description": "Plain text file",
+        "role": "Viewer",
+        "mimeType": "text/plain"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "linux": {
+      "target": ["AppImage"]
+    }
+  }
+}

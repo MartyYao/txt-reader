@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const jschardet = require('jschardet');
 
 const isDev = !app.isPackaged;
 
@@ -75,6 +76,33 @@ function createWindow() {
   });
 }
 
+// ── Encoding normalisation (jschardet → iconv-lite) ───────────
+function normalizeEncoding(enc) {
+  if (!enc) return null;
+  const key = enc.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const map = {
+    gb2312: 'gbk',
+    gb18030: 'gbk',
+    gbk: 'gbk',
+    big5: 'big5',
+    shiftjis: 'shift_jis',
+    euckr: 'euc-kr',
+    eucjp: 'euc-jp',
+    iso88591: 'latin1',
+    iso88592: 'iso-8859-2',
+    windows1250: 'windows-1250',
+    windows1251: 'windows-1251',
+    windows1252: 'windows-1252',
+    koi8r: 'koi8-r',
+    tis620: 'tis-620',
+    utf16le: 'utf-16le',
+    utf16be: 'utf-16be',
+    ascii: 'utf-8',
+    utf8: 'utf-8',
+  };
+  return map[key] || key;
+}
+
 // ── IPC Handlers ──────────────────────────────────────────────
 
 // Open file dialog
@@ -121,7 +149,26 @@ ipcMain.handle('file:read', async (_event, filePath, encodingHint) => {
     return { text: iconv.decode(buffer.slice(2), 'utf-16be'), encoding: 'utf-16be', size: buffer.length };
   }
 
-  // ── Multi-candidate scoring ────────────────────────────────
+  // ── jschardet auto-detection (primary) ──────────────────────
+  const detection = jschardet.detect(buffer);
+  if (detection && detection.encoding && detection.confidence >= 0.3) {
+    const detected = normalizeEncoding(detection.encoding);
+    if (detected) {
+      try {
+        const fullText = iconv.decode(buffer, detected);
+        // Sanity: reject if replacement characters exceed 1%
+        const replacements = (fullText.match(/�/g) || []).length;
+        if (replacements / fullText.length < 0.01) {
+          const display = (detected === 'gb18030' || detected === 'gb2312') ? 'gbk' : detected;
+          return { text: fullText, encoding: display, size: buffer.length };
+        }
+      } catch {
+        // decode failed → fall through to scoring
+      }
+    }
+  }
+
+  // ── Multi-candidate scoring (fallback) ──────────────────────
   const sample = buffer.slice(0, Math.min(buffer.length, 65536));
 
   function scoreText(text, enc) {

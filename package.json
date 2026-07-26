@@ -1,6 +1,6 @@
 {
   "name": "txt-reader",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "A clean, modern TXT reader for macOS with Chinese novel support",
   "main": "electron/main.js",
   "scripts": {
